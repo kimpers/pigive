@@ -12,7 +12,7 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
         ERC721Full("YearOfThePigBadge", "YPB")
         public
     {
-        require(_maxSupply > 0, "Positive max supply");
+        require(_maxSupply > 0, "requires positive max supply");
         maxSupply = _maxSupply;
     }
 
@@ -20,7 +20,7 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
     * @dev Don't allow for minting more than maxSupply
     */
     modifier lessThanMaxSupply() {
-        require(totalSupply() < maxSupply, "Max supply reached");
+        require(totalSupply() < maxSupply, "max supply reached");
         _;
     }
 
@@ -40,6 +40,7 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
     function mintTo(address _to, string memory _tokenURI)
         public
         onlyOwner
+        lessThanMaxSupply
         returns (uint)
     {
         uint256 newTokenId = _getNextTokenId();
