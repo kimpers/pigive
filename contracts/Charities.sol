@@ -6,16 +6,26 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 contract Charities is  Ownable {
     mapping(string => address) private charityAddresses;
 
+    /**
+     * @dev Log all new charities added
+     */
     event LogCharityAdded(
         string indexed name,
         address indexed _address
     );
 
+    /**
+     * @dev Log all Charities removed
+     */
     event LogCharityRemoved(
         string indexed name
     );
 
-    function getCharityByName(
+    /**
+     * @dev Get address of charity from name
+     * @param name string name identifying charity
+     */
+    function getCharityAddressByName(
         string memory name
     )
         view
@@ -30,6 +40,11 @@ contract Charities is  Ownable {
         return _address;
     }
 
+    /**
+     * @dev allows owner to add new charities to the list
+     * @param name string name identifying the charity
+     * @param _address address donation eth address for charity
+     */
     function addCharityEntry(
         string memory name,
         address _address
@@ -44,8 +59,8 @@ contract Charities is  Ownable {
         // Don't allow 0x address
         require(_address != address(0x0), "can't be 0x0 address");
 
-        // Don't allow changing existing items (remove then add new)
-        require(charityAddresses[name] == address(0x0));
+        // Don't allow overwriting existing items (remove then add new)
+        require(charityAddresses[name] == address(0x0), "charity already exists");
 
         charityAddresses[name] = _address;
 
@@ -55,12 +70,19 @@ contract Charities is  Ownable {
         );
     }
 
+    /**
+     * @dev allows owner to remove a charity from the list
+     * @param name string name identifying the charity
+     */
     function removeCharityEntry(
         string memory name
     )
         onlyOwner
         public
     {
+        // Only allow deleting existing entries
+        require(charityAddresses[name] != address(0x0), "charity does not exist");
+
         delete charityAddresses[name];
 
         emit LogCharityRemoved(

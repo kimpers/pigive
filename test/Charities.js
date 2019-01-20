@@ -63,6 +63,14 @@ contract("Charities", accounts => {
         truffleAssert.ErrorType.REVERT
       );
     });
+    it("does not allow removing a non existing charity", async () => {
+      await truffleAssert.fails(
+        charities.removeCharityEntry("DogeCharity", {
+          from: owner
+        }),
+        truffleAssert.ErrorType.REVERT
+      );
+    });
   });
 
   describe("getting", () => {
@@ -73,9 +81,12 @@ contract("Charities", accounts => {
         })
       );
 
-      const result = await charities.getCharityByName.call("DogeCharity", {
-        from: otherAccounts[1]
-      });
+      const result = await charities.getCharityAddressByName.call(
+        "DogeCharity",
+        {
+          from: otherAccounts[1]
+        }
+      );
 
       assert.equal(result, otherAccounts[0], "correct charity address");
     });
@@ -88,7 +99,7 @@ contract("Charities", accounts => {
       );
 
       await truffleAssert.fails(
-        charities.getCharityByName.call("FakeCharity", {
+        charities.getCharityAddressByName.call("FakeCharity", {
           from: otherAccounts[1]
         }),
         truffleAssert.ErrorType.REVERT
