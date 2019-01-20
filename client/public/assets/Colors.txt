@@ -1,0 +1,11 @@
+Sky Color: #01110a
+
+Moon Light Color: #fff8f0
+Moon Dark Color: #d1ccc9
+
+Dark Red Color: #9e0b0f
+Yellow Color: #f9d50d
+
+Fonts
+Color Light: #fff8f0
+Color Dark: #333333
