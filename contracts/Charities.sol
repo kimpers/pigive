@@ -4,7 +4,7 @@ pragma solidity ^0.5.1;
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract Charities is  Ownable {
-    mapping(string => address) private charityAddresses;
+    mapping(string => address payable) private charityAddresses;
 
     /**
      * @dev Log all new charities added
@@ -30,9 +30,9 @@ contract Charities is  Ownable {
     )
         view
         public
-        returns (address)
+        returns (address payable)
     {
-        address _address =  charityAddresses[name];
+        address payable _address =  charityAddresses[name];
 
         // Don't allow getting entries that don't exist
         require(_address != address(0x0), "does not exist");
@@ -47,7 +47,7 @@ contract Charities is  Ownable {
      */
     function addCharityEntry(
         string memory name,
-        address _address
+        address payable _address
     )
         onlyOwner
         public
