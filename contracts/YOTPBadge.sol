@@ -8,6 +8,7 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
     uint maxSupply;
     mapping(uint => BadgeInfo) public badgeInfos;
+    mapping(uint => string) public badgeLevelURIs;
 
     constructor(uint _maxSupply)
         ERC721Full("YearOfThePigBadge", "YPB")
@@ -46,11 +47,9 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
     /**
     * @dev Mints a a badge to a specified address
     * @param _to address for the receiver of bage
-    * @param _tokenURI IPFS hash for badge image
     */
     function mintTo(
         address _to,
-        string memory _tokenURI,
         uint _amount,
         string memory _charityId
     )
@@ -60,13 +59,46 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
         returns (uint)
     {
         uint256 newTokenId = _getNextTokenId();
-        _mint(_to, newTokenId);
-        _setTokenURI(newTokenId, _tokenURI);
-        _setBadgeInfo(newTokenId, _amount, _charityId);
+        BadgeLevel badgeLevel = _getBadgeLevel(_amount);
+        string memory badgeURI = getBadgeLevelURI(badgeLevel);
 
-        emit LogMinted(newTokenId, _tokenURI);
+        _mint(_to, newTokenId);
+        _setTokenURI(newTokenId, badgeURI);
+        _setBadgeInfo(newTokenId, _amount, badgeLevel, _charityId);
+
+        emit LogMinted(newTokenId, badgeURI);
 
         return newTokenId;
+    }
+
+    /**
+     * @dev allows owner to set IPFS hash for images for the different badge levels
+     * @param uri string IPFS hash for badge level image
+     */
+    function setBadgeLevelURI(BadgeLevel badgeLevel, string memory uri)
+        onlyOwner
+        public
+    {
+        uint256 uriLength = bytes(uri).length;
+        // Don't allow empty uri
+        require(uriLength != 0, "uri empty");
+
+        badgeLevelURIs[uint(badgeLevel)] = uri;
+    }
+
+    /**
+     * @dev get ipfs hash for badge level
+     * @param badgeLevel BadgeLevel level for which to get the URI
+     * @return ipfs hash for badge image
+     */
+    function getBadgeLevelURI(BadgeLevel badgeLevel)
+        view
+        public
+        returns (string memory)
+    {
+        string memory uri = badgeLevelURIs[uint(badgeLevel)];
+
+        return uri;
     }
 
     /**
@@ -100,13 +132,12 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
     function _setBadgeInfo(
         uint tokenId,
         uint amount,
+        BadgeLevel badgeLevel,
         string memory charityId
     )
         private
     {
         require(_exists(tokenId));
-
-        BadgeLevel badgeLevel = _getBadgeLevel(amount);
 
         BadgeInfo memory badgeInfo = BadgeInfo(
             amount,
