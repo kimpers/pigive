@@ -7,24 +7,29 @@ class App extends Component {
   constructor(props) {
     super(props);
     const { drizzle } = props;
-    const { Daica } = drizzle.contracts;
-    const helloKey = Daica.methods.hello.cacheCall();
+    const { Charities } = drizzle.contracts;
+    const charityKey = Charities.methods.getCharityAddressByName.cacheCall(
+      "InternetArchive"
+    );
 
     this.state = {
-      helloKey
+      charityKey
     };
   }
 
   render() {
     const { drizzleState } = this.props;
-    const { Daica } = drizzleState.contracts;
-    const { helloKey } = this.state;
-    const helloValue = idx(Daica, _ => _.hello[helloKey].value);
+    const { Charities } = drizzleState.contracts;
+    const { charityKey } = this.state;
+    const charityAddress = idx(
+      Charities,
+      _ => _.getCharityAddressByName[charityKey].value
+    );
 
     return (
       <ThemeProvider>
         <div>
-          <Heading.h1>{helloValue}</Heading.h1>
+          <Heading.h1>{charityAddress}</Heading.h1>
         </div>
       </ThemeProvider>
     );

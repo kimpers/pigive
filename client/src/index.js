@@ -2,13 +2,19 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Drizzle, generateStore } from "drizzle";
 import { DrizzleContext } from "drizzle-react";
-import DaicaContract from "./contracts/Daica.json";
+import YOTPBadge from "./contracts/YOTPBadge.json";
+import Charities from "./contracts/Charities.json";
+import DonationManager from "./contracts/DonationManager.json";
 
 import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
-const options = { contracts: [DaicaContract], polls: { accounts: 1500 } };
+const options = {
+  contracts: [YOTPBadge, Charities, DonationManager],
+  polls: { accounts: 1500 }
+};
+
 const drizzleStore = generateStore(options);
 const drizzle = new Drizzle(options, drizzleStore);
 

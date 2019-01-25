@@ -4,6 +4,7 @@ pragma solidity ^0.5.1;
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract Charities is  Ownable {
+    // TODO: refactor this to a dynamic array of struct { name, address }
     mapping(string => address payable) private charityAddresses;
 
     /**
