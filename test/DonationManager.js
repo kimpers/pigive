@@ -38,28 +38,99 @@ contract("DonationManager", accounts => {
 
     // Allow donations manager to mint tokens as the owner
     await badge.transferOwnership(donationsManager.address);
-    await charities.transferOwnership(donationsManager.address);
   });
 
   describe("donate", () => {
     it("allows non-owner to donate to charity and receive token", async () => {
+      const charityPreDonationBalance = web3.utils.fromWei(
+        await web3.eth.getBalance(charityAccount),
+        "ether"
+      );
+
       const results = await donationsManager.donate(CHARITY_NAME, nonOwner, {
         from: nonOwner,
-        value: 1000
+        value: web3.utils.toWei("1", "ether")
       });
+      const charityPostDonationBalance = web3.utils.fromWei(
+        await web3.eth.getBalance(charityAccount),
+        "ether"
+      );
 
       await truffleAssert.passes(results);
       truffleAssert.eventEmitted(results, "LogDonation");
-      console.log(results);
-      // TODO check that correct amount was actually transfered
+
+      assert.equal(
+        charityPostDonationBalance - charityPreDonationBalance,
+        1,
+        "Charity receives donation funds"
+      );
+
+      const tokenOwner = await badge.ownerOf.call(1);
+      assert.equal(tokenOwner, nonOwner);
     });
 
     it("allows non-owner to dondate to charity and send token to someone else", async () => {
-      // TODO: implement
+      const charityPreDonationBalance = web3.utils.fromWei(
+        await web3.eth.getBalance(charityAccount),
+        "ether"
+      );
+
+      const otherAccount = otherAccounts[0];
+
+      const results = await donationsManager.donate(
+        CHARITY_NAME,
+        otherAccount,
+        {
+          from: nonOwner,
+          value: web3.utils.toWei("1", "ether")
+        }
+      );
+
+      const charityPostDonationBalance = web3.utils.fromWei(
+        await web3.eth.getBalance(charityAccount),
+        "ether"
+      );
+
+      await truffleAssert.passes(results);
+      truffleAssert.eventEmitted(results, "LogDonation");
+
+      assert.equal(
+        charityPostDonationBalance - charityPreDonationBalance,
+        1,
+        "Charity receives donation funds"
+      );
+
+      const tokenOwner = await badge.ownerOf.call(1);
+      assert.equal(tokenOwner, otherAccount);
     });
 
     it("does not allow donations after max supply of badge has been reached", async () => {
-      // TODO: implement
+      await truffleAssert.passes(
+        donationsManager.donate(CHARITY_NAME, nonOwner, {
+          from: nonOwner,
+          value: web3.utils.toWei("1", "ether")
+        })
+      );
+
+      assert.equal(await badge.ownerOf.call(1), nonOwner);
+
+      await truffleAssert.passes(
+        donationsManager.donate(CHARITY_NAME, otherAccounts[0], {
+          from: nonOwner,
+          value: web3.utils.toWei("1", "ether")
+        })
+      );
+
+      assert.equal(await badge.ownerOf.call(2), otherAccounts[0]);
+
+      await truffleAssert.fails(
+        donationsManager.donate(CHARITY_NAME, nonOwner, {
+          from: nonOwner,
+          value: web3.utils.toWei("1", "ether")
+        }),
+        truffleAssert.ErrorType.REVERT,
+        "max supply reached"
+      );
     });
   });
 });

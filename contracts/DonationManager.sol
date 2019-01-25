@@ -58,8 +58,4 @@ contract DonationManager {
 
         charityAddress.transfer(msg.value);
     }
-
-    // TODO: Add proxy method to allow owner of this contract to add, remove charities, setBadgeLevelURI
-    // While not allowing arbitrary calls to mintTo
-
 }
