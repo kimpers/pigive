@@ -1,51 +1,41 @@
-import React, { Component } from "react";
-import idx from "idx";
-import { ThemeProvider, Heading } from "rimble-ui";
+import React, { useState } from "react";
+import { ThemeProvider, Heading, Loader } from "rimble-ui";
 import { DrizzleContext } from "drizzle-react";
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    const { drizzle } = props;
-    const { Charities } = drizzle.contracts;
-    const charityKey = Charities.methods.getCharityAddressByName.cacheCall(
-      "InternetArchive"
-    );
+import CharityDropDown from "./components/CharityDropDown";
 
-    this.state = {
-      charityKey
-    };
-  }
-
-  render() {
-    const { drizzleState } = this.props;
-    const { Charities } = drizzleState.contracts;
-    const { charityKey } = this.state;
-    const charityAddress = idx(
-      Charities,
-      _ => _.getCharityAddressByName[charityKey].value
-    );
-
-    return (
-      <ThemeProvider>
-        <div>
-          <Heading.h1>{charityAddress}</Heading.h1>
-        </div>
-      </ThemeProvider>
-    );
-  }
-}
+const App = () => {
+  const [charityName, setCharityName] = useState();
+  return (
+    <ThemeProvider>
+      <div>
+        <Heading.h1>YOTP</Heading.h1>
+        <CharityDropDown
+          charityName={charityName}
+          setCharityName={e => setCharityName(e.target.value)}
+        />
+      </div>
+    </ThemeProvider>
+  );
+};
 
 export default () => (
   <DrizzleContext.Consumer>
     {drizzleContext => {
-      const { drizzle, drizzleState, initialized } = drizzleContext;
+      const { initialized } = drizzleContext;
 
       if (!initialized) {
-        return "Loading...";
+        return (
+          <Loader
+            style={{
+              margin: "auto"
+            }}
+            size="100px"
+          />
+        );
       }
 
-      return <App drizzle={drizzle} drizzleState={drizzleState} />;
+      return <App />;
     }}
   </DrizzleContext.Consumer>
 );

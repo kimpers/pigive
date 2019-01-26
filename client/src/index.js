@@ -10,8 +10,23 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
+const CONTRACT_DEPLOYMENT_BLOCK =
+  process.env.REACT_APP_CONTRACT_DEPLOYMENT_BLOCK || 0;
+
 const options = {
   contracts: [YOTPBadge, Charities, DonationManager],
+  events: {
+    Charities: [
+      {
+        eventName: "LogCharityAdded",
+        eventOptions: { fromBlock: CONTRACT_DEPLOYMENT_BLOCK }
+      },
+      {
+        eventName: "LogCharityRemoved",
+        eventOptions: { fromBlock: CONTRACT_DEPLOYMENT_BLOCK }
+      }
+    ]
+  },
   polls: { accounts: 1500 }
 };
 

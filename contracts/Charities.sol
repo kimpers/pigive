@@ -11,15 +11,15 @@ contract Charities is  Ownable {
      * @dev Log all new charities added
      */
     event LogCharityAdded(
-        string indexed name,
-        address indexed _address
+        string name,
+        address _address
     );
 
     /**
      * @dev Log all Charities removed
      */
     event LogCharityRemoved(
-        string indexed name
+        string name
     );
 
     /**
