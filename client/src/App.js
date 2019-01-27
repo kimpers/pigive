@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ThemeProvider, Heading, Loader } from "rimble-ui";
+import { ThemeProvider, Loader } from "rimble-ui";
 import { DrizzleContext } from "drizzle-react";
 
 import CharityDropDown from "./components/CharityDropDown";
@@ -8,15 +8,13 @@ import Background from "./components/Background";
 const App = () => {
   const [charityName, setCharityName] = useState();
   return (
-    <ThemeProvider>
-      <div>
-        <Heading.h1>YOTP</Heading.h1>
+    <ThemeProvider style={{ height: "100%" }}>
+      <Background>
         <CharityDropDown
           charityName={charityName}
           setCharityName={e => setCharityName(e.target.value)}
         />
-        <Background style={{ height: "50%" }} />
-      </div>
+      </Background>
     </ThemeProvider>
   );
 };

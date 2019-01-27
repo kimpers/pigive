@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { times, once } from "ramda";
 
 import { ReactComponent as FlagSvg } from "./Flag.svg";
 import { device } from "../../constants";
@@ -7,7 +8,7 @@ import { device } from "../../constants";
 const Flag = styled(FlagSvg)`
   height: 200px
   width: 200px;
-  bottom: 200px
+  bottom: 190px
   right: -50px;
 
   position: fixed;
@@ -16,7 +17,7 @@ const Flag = styled(FlagSvg)`
   @media ${device.desktop} {
     height: 400px
     width: 400px;
-    bottom: 380px;
+    bottom: 370px;
   }
 
   @media (min-width: 3000px) {
@@ -33,20 +34,53 @@ const BackgroundContainer = styled.div`
   overflow: hidden;
   width: 100%;
   position: absolute;
-  bottom: 0px;
+  bottom: -10px;
 
   @media ${device.desktop} {
     max-height: 600px;
   }
 `;
 
-const Background = () => (
-  <div>
+const RandomStars = once(() => {
+  const GenerateStar = () => {
+    const top = Math.floor(Math.random() * 50);
+    const left = Math.floor(Math.random() * 90) + 5;
+    const size = Math.floor(Math.random() * 10) + 10;
+    const opacity = Math.min(Math.random() + 0.2, 1);
+
+    return (
+      <div
+        style={{
+          top: `${top}%`,
+          left: `${left}%`,
+          width: `${size}px`,
+          height: `${size}px`,
+          opacity: `${opacity}`,
+          background: "#fff",
+          borderRadius: "50%",
+          position: "absolute"
+        }}
+      />
+    );
+  };
+
+  return times(GenerateStar, 8);
+});
+
+const Space = styled.div`
+  height: 100%;
+  background: linear-gradient(#01110a, #01110ab8);
+`;
+
+const Background = ({ children }) => (
+  <Space>
+    {children}
+    <RandomStars />
     <BackgroundContainer>
       <Moon />
     </BackgroundContainer>
     <Flag />
-  </div>
+  </Space>
 );
 
 const Moon = () => (
