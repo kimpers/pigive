@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import { times, once } from "ramda";
+import { times, once, all } from "ramda";
 
 import { ReactComponent as FlagSvg } from "./Flag.svg";
+import planetPath from "./planet.png";
 import { device } from "../../constants";
 
 const Flag = styled(FlagSvg)`
@@ -41,10 +42,46 @@ const BackgroundContainer = styled.div`
   }
 `;
 
+const Planet = styled.img`
+  position: absolute;
+  right: 100px;
+  top: 10px;
+  z-index: 1;
+
+  @media (max-width: 310px) {
+    display: none;
+  }
+`;
+
 const RandomStars = once(() => {
+  const prevTop = [];
+  const prevLeft = [];
+
+  // Generate random positions for each star but make sure
+  // to never put a new star too close to an existing star
+  const getUniqueRandom = (prevValues, multiplier, addition = 0) => {
+    let tries = 0;
+    while (true) {
+      const current = Math.floor(Math.random() * multiplier) + addition;
+
+      if (all(v => Math.abs(v - current) >= 5, prevValues) || tries > 10) {
+        prevValues.push(current);
+        return current;
+      } else {
+        console.log(
+          `current ${current} is duplicated in ${prevValues.join(
+            ", "
+          )}, tries ${tries}`
+        );
+      }
+
+      tries++;
+    }
+  };
+
   const GenerateStar = () => {
-    const top = Math.floor(Math.random() * 50);
-    const left = Math.floor(Math.random() * 90) + 5;
+    const top = getUniqueRandom(prevTop, 50, 5);
+    const left = getUniqueRandom(prevLeft, 90, 5);
     const size = Math.floor(Math.random() * 10) + 10;
     const opacity = Math.min(Math.random() + 0.2, 1);
 
@@ -64,7 +101,9 @@ const RandomStars = once(() => {
     );
   };
 
-  return times(GenerateStar, 8);
+  const numStars = window.innerWidth >= 1024 ? 8 : 5;
+
+  return times(GenerateStar, numStars);
 });
 
 const Space = styled.div`
@@ -74,6 +113,7 @@ const Space = styled.div`
 
 const Background = ({ children }) => (
   <Space>
+    <Planet src={planetPath} />
     {children}
     <RandomStars />
     <BackgroundContainer>
