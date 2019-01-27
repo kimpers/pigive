@@ -3,6 +3,7 @@ import { ThemeProvider, Heading, Loader } from "rimble-ui";
 import { DrizzleContext } from "drizzle-react";
 
 import CharityDropDown from "./components/CharityDropDown";
+import Background from "./components/Background";
 
 const App = () => {
   const [charityName, setCharityName] = useState();
@@ -14,6 +15,7 @@ const App = () => {
           charityName={charityName}
           setCharityName={e => setCharityName(e.target.value)}
         />
+        <Background style={{ height: "50%" }} />
       </div>
     </ThemeProvider>
   );
