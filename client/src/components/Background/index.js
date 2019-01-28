@@ -45,6 +45,7 @@ const BackgroundContainer = styled.div`
 const Planet = styled.img`
   position: absolute;
   right: 100px;
+  width: 150px;
   top: 10px;
   z-index: 1;
 
@@ -67,19 +68,14 @@ const RandomStars = once(() => {
       if (all(v => Math.abs(v - current) >= 5, prevValues) || tries > 10) {
         prevValues.push(current);
         return current;
-      } else {
-        console.log(
-          `current ${current} is duplicated in ${prevValues.join(
-            ", "
-          )}, tries ${tries}`
-        );
       }
 
       tries++;
     }
   };
 
-  const GenerateStar = () => {
+  // TODO: add twinkling effect
+  const GenerateStar = i => {
     const top = getUniqueRandom(prevTop, 50, 5);
     const left = getUniqueRandom(prevLeft, 90, 5);
     const size = Math.floor(Math.random() * 10) + 10;
@@ -87,6 +83,7 @@ const RandomStars = once(() => {
 
     return (
       <div
+        key={`star-${i}`}
         style={{
           top: `${top}%`,
           left: `${left}%`,
@@ -111,10 +108,24 @@ const Space = styled.div`
   background: linear-gradient(#01110a, #01110ab8);
 `;
 
+const MainContentWrapper = styled.div`
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 50%;
+  min-width: 375px;
+  height: 400px;
+`;
+
 const Background = ({ children }) => (
   <Space>
     <Planet src={planetPath} />
-    {children}
+    <MainContentWrapper>{children}</MainContentWrapper>
+
     <RandomStars />
     <BackgroundContainer>
       <Moon />

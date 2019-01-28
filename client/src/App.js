@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import { ThemeProvider, Loader } from "rimble-ui";
 import { DrizzleContext } from "drizzle-react";
 
 import Background from "./components/Background";
+import DonationForm from "./components/DonationForm";
 
 const App = () => {
   return (
     <ThemeProvider style={{ height: "100%" }}>
-      <Background />
+      <Background>
+        <DonationForm />
+      </Background>
     </ThemeProvider>
   );
 };

@@ -1,6 +1,11 @@
 import React from "react";
+import styled from "styled-components";
 import { DrizzleContext } from "drizzle-react";
 import { Select } from "rimble-ui";
+
+const StyledSelect = styled(Select)`
+  color: #333;
+`;
 
 const filterActiveCharities = allEvents => {
   const charitiyAddedEvents = allEvents.filter(
@@ -30,7 +35,7 @@ const CharityDropDown = ({ charityName, setCharityName }) => {
         }
 
         return (
-          <Select
+          <StyledSelect
             items={activeCharities.map(e => e.name)}
             value={charityName}
             onChange={setCharityName}
