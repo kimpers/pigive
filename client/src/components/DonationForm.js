@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Heading, Text, Input, Button } from "rimble-ui";
+import { Heading, Text, Input, Button, Select } from "rimble-ui";
 
 import CharityDropDown from "./CharityDropDown";
 import { device } from "../constants";
+
+const FormSelect = styled(Select)`
+  color: #333;
+`;
 
 const FormWrapper = styled.div`
   height: 100%;
@@ -53,8 +57,17 @@ const ContentBox = styled.div`
   align-self: center;
 `;
 
+const donationLevelMapping = {
+  Gold: 1,
+  Silver: 0.1,
+  Bronze: 0.01
+};
+
 const DonationForm = () => {
   const [charityName, setCharityName] = useState();
+  const [donationLevel, setDonationLevel] = useState("Bronze");
+  const donationAmount = donationLevelMapping[donationLevel] || "Bronze";
+
   return (
     <FormWrapper>
       <ContentBox>
@@ -67,7 +80,20 @@ const DonationForm = () => {
           <FormText>Charity to donate to</FormText>
         </FormRow>
         <FormRow>
-          <FormInput type="number" step={0.01} defaultValue={0.01} />
+          <FormSelect
+            items={["Bronze", "Silver", "Gold"]}
+            value={donationLevel}
+            onChange={e => setDonationLevel(e.target.value)}
+          />
+          <FormText>Select donation level</FormText>
+        </FormRow>
+        <FormRow>
+          <FormInput
+            type="number"
+            step={0.01}
+            value={donationAmount}
+            disabled
+          />
           <FormText>Amount (in ETH)</FormText>
         </FormRow>
         <FormRow>
