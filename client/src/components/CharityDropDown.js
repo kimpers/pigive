@@ -5,6 +5,7 @@ import { Select } from "rimble-ui";
 
 const StyledSelect = styled(Select)`
   color: #333;
+  width: 100%;
 `;
 
 const filterActiveCharities = allEvents => {
@@ -34,11 +35,16 @@ const CharityDropDown = ({ charityName, setCharityName }) => {
           return null;
         }
 
+        // Set initial state
+        if (!charityName) {
+          setCharityName(activeCharities[0].name);
+        }
+
         return (
           <StyledSelect
             items={activeCharities.map(e => e.name)}
             value={charityName}
-            onChange={setCharityName}
+            onChange={e => setCharityName(e.target.value)}
           />
         );
       }}

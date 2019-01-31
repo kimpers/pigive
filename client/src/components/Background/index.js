@@ -9,7 +9,7 @@ import { device } from "../../constants";
 const Flag = styled(FlagSvg)`
   height: 200px
   width: 200px;
-  bottom: 190px
+  bottom: 390px
   right: -50px;
 
   position: fixed;
@@ -21,8 +21,8 @@ const Flag = styled(FlagSvg)`
     bottom: 370px;
   }
 
-  @media (min-width: 3000px) {
-    display: none;
+  @media (min-width: 2500px) {
+    bottom: 280px;
   }
 
   @media (max-width: 310px) {
@@ -31,7 +31,7 @@ const Flag = styled(FlagSvg)`
 `;
 
 const BackgroundContainer = styled.div`
-  max-height: 400px;
+  max-height: 500px;
   overflow: hidden;
   width: 100%;
   position: absolute;
@@ -118,7 +118,7 @@ const MainContentWrapper = styled.div`
   z-index: 1;
   width: 50%;
   min-width: 375px;
-  height: 400px;
+  height: 500px;
 `;
 
 const Background = ({ children }) => (
