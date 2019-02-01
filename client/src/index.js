@@ -2,11 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Drizzle, generateStore } from "drizzle";
 import { DrizzleContext } from "drizzle-react";
+import { ToastContainer } from "react-toastify";
 import YOTPBadge from "./contracts/YOTPBadge.json";
 import Charities from "./contracts/Charities.json";
 import DonationManager from "./contracts/DonationManager.json";
 
 import "./index.css";
+import "react-toastify/dist/ReactToastify.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
@@ -36,8 +38,19 @@ const drizzle = new Drizzle(options, drizzleStore);
 ReactDOM.render(
   <DrizzleContext.Provider drizzle={drizzle}>
     <App />
+    <ToastContainer
+      position="top-right"
+      autoClose={5000}
+      closeOnClick
+      pauseOnVisibilityChange
+      draggable
+      pauseOnHover
+      closeButton={false}
+      style={{
+        textAlign: "center"
+      }}
+    />
   </DrizzleContext.Provider>,
-
   document.getElementById("root")
 );
 

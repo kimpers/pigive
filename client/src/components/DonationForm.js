@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { isNil } from "ramda";
+import idx from "idx";
 import { DrizzleContext } from "drizzle-react";
-import { Heading, Text, Input, Button, Select, Flex } from "rimble-ui";
+import { toast } from "react-toastify";
+import { Heading, Text, Input, Button, Select, Flex, Loader } from "rimble-ui";
 
-import CharityDropDown from "./CharityDropDown";
 import { device } from "../constants";
 
 const FormSelect = styled(Select)`
   color: #333;
   width: 100%;
+
+  :disabled {
+    opacity: 0.7;
+  }
 `;
 
 const FormWrapper = styled.div`
@@ -38,6 +44,10 @@ const FormText = styled(Text.span)`
 
 const FormInput = styled(Input)`
   color: #333;
+
+  :disabled {
+    opacity: 0.7;
+  }
 `;
 
 const DonateButton = styled(Button)`
@@ -66,22 +76,65 @@ const donationLevelMapping = {
   Bronze: 0.008
 };
 
-const DonationForm = ({ donationContract, currentAccount, toWei }) => {
+const filterActiveCharities = allEvents => {
+  const charitiyAddedEvents = allEvents.filter(
+    e => e.event === "LogCharityAdded"
+  );
+  const removedCharities = new Set(
+    allEvents.filter(e => e.event === "LogCharityRemoved")
+  );
+
+  return charitiyAddedEvents
+    .filter(e => !removedCharities.has(e.event))
+    .map(c => c.returnValues);
+};
+
+const DonationForm = ({
+  donationContract,
+  currentAccount,
+  toWei,
+  drizzleState
+}) => {
   const [charityName, setCharityName] = useState();
   const [donationLevel, setDonationLevel] = useState("Bronze");
   const [donationAmount, setDonationAmount] = useState(0.008);
   const [receiverAccount, setReceiverAccount] = useState(currentAccount);
-  const [donationProgressKey, setDonationProgressKey] = useState();
+  const [donationKey, setDonationKey] = useState();
+  const [donationStatus, setDonationStatus] = useState();
 
   const donate = () => {
-    const progressKey = donationContract.methods.donate.cacheSend(
+    const donationKey = donationContract.methods.donate.cacheSend(
       charityName,
       receiverAccount,
       { value: toWei(donationAmount) }
     );
-    // TODO: handle this with loader
-    setDonationProgressKey(progressKey);
+
+    setDonationKey(donationKey);
   };
+
+  const activeCharities = filterActiveCharities(
+    drizzleState.contracts.Charities.events
+  );
+  if (activeCharities.length && !charityName) {
+    setCharityName(activeCharities[0].name);
+  }
+
+  if (!isNil(donationKey)) {
+    const donationTx = drizzleState.transactionStack[donationKey];
+    const status = idx(drizzleState, _ => _.transactions[donationTx].status);
+
+    if (donationStatus === "pending" && status === "success") {
+      toast.success(`Donation successful!`);
+    } else if (donationStatus === "pending" && status === "error") {
+      toast.error("Something went wrong.");
+    }
+
+    if (donationStatus !== status) {
+      setDonationStatus(status);
+    }
+  }
+
+  const isPending = donationStatus === "pending";
 
   return (
     <FormWrapper>
@@ -89,14 +142,17 @@ const DonationForm = ({ donationContract, currentAccount, toWei }) => {
         <FormHeading>Donate to receive your collectible</FormHeading>
         <Flex flexDirection="column">
           <FormText>Charity to donate to</FormText>
-          <CharityDropDown
-            charityName={charityName}
-            setCharityName={setCharityName}
+          <FormSelect
+            disabled={isPending}
+            items={activeCharities.map(e => e.name)}
+            value={charityName}
+            onChange={e => setCharityName(e.target.value)}
           />
         </Flex>
         <Flex flexDirection="column">
           <FormText>Select donation level</FormText>
           <FormSelect
+            disabled={isPending}
             items={["Bronze", "Silver", "Gold", "Custom"]}
             value={donationLevel}
             onChange={e => {
@@ -117,19 +173,38 @@ const DonationForm = ({ donationContract, currentAccount, toWei }) => {
             step={0.01}
             value={donationAmount}
             onChange={e => setDonationAmount(e.target.value)}
-            disabled={donationLevel !== "Custom"}
+            disabled={donationLevel !== "Custom" || isPending}
           />
         </Flex>
         <Flex flexDirection="column">
           <FormText>Token receiver address</FormText>
           <FormInput
+            disabled={isPending}
             size="48"
             value={receiverAccount}
             onChange={e => setReceiverAccount(e.target.value)}
           />
         </Flex>
-        <DonateButton icon="AttachMoney" iconpos="right" onClick={donate}>
-          Claim Token
+        <DonateButton
+          disabled={isPending}
+          icon={isPending ? null : "AttachMoney"}
+          iconpos="right"
+          onClick={donate}
+        >
+          {isPending ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                lineHeight: "40px"
+              }}
+            >
+              <span style={{ marginRight: "10px" }}>Loading...</span>
+              <Loader size="40px" />
+            </div>
+          ) : (
+            <span>Claim Token</span>
+          )}
         </DonateButton>
       </ContentBox>
     </FormWrapper>
@@ -147,6 +222,7 @@ export default () => (
       return (
         <DonationForm
           donationContract={drizzle.contracts.DonationManager}
+          drizzleState={drizzleState}
           currentAccount={currentAccount}
           toWei={toWei}
         />
