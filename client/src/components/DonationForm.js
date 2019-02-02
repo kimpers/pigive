@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import styled from "styled-components";
 import { isNil } from "ramda";
 import idx from "idx";
 import { DrizzleContext } from "drizzle-react";
 import { toast } from "react-toastify";
-import { Heading, Text, Input, Button, Select, Flex, Loader } from "rimble-ui";
+import {
+  Heading,
+  Text,
+  Input,
+  Button,
+  Select,
+  Flex,
+  Loader,
+  Textarea
+} from "rimble-ui";
 
 import { device } from "../constants";
 
@@ -50,7 +59,7 @@ const FormInput = styled(Input)`
   }
 `;
 
-const DonateButton = styled(Button)`
+const FormButton = styled(Button)`
   background-color: #aa381e
   color: #ffd700;
   width: 100%;
@@ -90,6 +99,99 @@ const filterActiveCharities = allEvents => {
     .map(c => c.returnValues);
 };
 
+const FormStep1 = ({
+  activeCharities,
+  charityName,
+  setCharityName,
+  donationLevel,
+  setDonationLevel,
+  donationAmount,
+  setDonationAmount,
+  setFormStep
+}) => (
+  <Fragment>
+    <Flex flexDirection="column">
+      <FormText>Charity to donate to</FormText>
+      <FormSelect
+        items={activeCharities.map(e => e.name)}
+        value={charityName}
+        onChange={e => setCharityName(e.target.value)}
+      />
+    </Flex>
+    <Flex flexDirection="column">
+      <FormText>Select donation level</FormText>
+      <FormSelect
+        items={["Bronze", "Silver", "Gold", "Custom"]}
+        value={donationLevel}
+        onChange={e => {
+          const level = e.target.value;
+          const amount = donationLevelMapping[level];
+
+          setDonationLevel(level);
+          if (amount && level !== "Custom") {
+            setDonationAmount(amount);
+          }
+        }}
+      />
+    </Flex>
+    <Flex flexDirection="column">
+      <FormText>Amount (in ETH)</FormText>
+      <FormInput
+        type="number"
+        step={0.01}
+        value={donationAmount}
+        onChange={e => setDonationAmount(e.target.value)}
+        disabled={donationLevel !== "Custom"}
+      />
+    </Flex>
+    <FormButton onClick={() => setFormStep(2)}>Continue</FormButton>
+  </Fragment>
+);
+
+const FormStep2 = ({
+  isPending,
+  receiverAccount,
+  setReceiverAccount,
+  donate
+}) => (
+  <Fragment>
+    <Flex flexDirection="column">
+      <FormText>Token receiver address</FormText>
+      <FormInput
+        disabled={isPending}
+        size="48"
+        value={receiverAccount}
+        onChange={e => setReceiverAccount(e.target.value)}
+      />
+    </Flex>
+    <Flex flexDirection="column">
+      <FormText>Message</FormText>
+      <Textarea rows={4} disabled={isPending} style={{ resize: "none" }} />
+    </Flex>
+    <FormButton
+      disabled={isPending}
+      icon={isPending ? null : "AttachMoney"}
+      iconpos="right"
+      onClick={donate}
+    >
+      {isPending ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            lineHeight: "40px"
+          }}
+        >
+          <span style={{ marginRight: "10px" }}>Loading...</span>
+          <Loader size="40px" />
+        </div>
+      ) : (
+        <span>Claim Token</span>
+      )}
+    </FormButton>
+  </Fragment>
+);
+
 const DonationForm = ({
   donationContract,
   donationLevel,
@@ -103,6 +205,8 @@ const DonationForm = ({
   const [receiverAccount, setReceiverAccount] = useState(currentAccount);
   const [donationKey, setDonationKey] = useState();
   const [donationStatus, setDonationStatus] = useState();
+  const [formStep, setFormStep] = useState(1);
+  const [message, setMessage] = useState("");
 
   const donate = () => {
     const donationKey = donationContract.methods.donate.cacheSend(
@@ -142,72 +246,27 @@ const DonationForm = ({
     <FormWrapper>
       <ContentBox>
         <FormHeading>Donate to receive your collectible</FormHeading>
-        <Flex flexDirection="column">
-          <FormText>Charity to donate to</FormText>
-          <FormSelect
-            disabled={isPending}
-            items={activeCharities.map(e => e.name)}
-            value={charityName}
-            onChange={e => setCharityName(e.target.value)}
+        {formStep === 1 ? (
+          <FormStep1
+            activeCharities={activeCharities}
+            charityName={charityName}
+            setCharityName={setCharityName}
+            donationLevel={donationLevel}
+            setDonationLevel={setDonationLevel}
+            donationAmount={donationAmount}
+            setDonationAmount={setDonationAmount}
+            setFormStep={setFormStep}
           />
-        </Flex>
-        <Flex flexDirection="column">
-          <FormText>Select donation level</FormText>
-          <FormSelect
-            disabled={isPending}
-            items={["Bronze", "Silver", "Gold", "Custom"]}
-            value={donationLevel}
-            onChange={e => {
-              const level = e.target.value;
-              const amount = donationLevelMapping[level];
-
-              setDonationLevel(level);
-              if (amount && level !== "Custom") {
-                setDonationAmount(amount);
-              }
-            }}
+        ) : (
+          <FormStep2
+            isPending={isPending}
+            receiverAccount={receiverAccount}
+            setReceiverAccount={setReceiverAccount}
+            message={message}
+            setMessage={setMessage}
+            donate={donate}
           />
-        </Flex>
-        <Flex flexDirection="column">
-          <FormText>Amount (in ETH)</FormText>
-          <FormInput
-            type="number"
-            step={0.01}
-            value={donationAmount}
-            onChange={e => setDonationAmount(e.target.value)}
-            disabled={donationLevel !== "Custom" || isPending}
-          />
-        </Flex>
-        <Flex flexDirection="column">
-          <FormText>Token receiver address</FormText>
-          <FormInput
-            disabled={isPending}
-            size="48"
-            value={receiverAccount}
-            onChange={e => setReceiverAccount(e.target.value)}
-          />
-        </Flex>
-        <DonateButton
-          disabled={isPending}
-          icon={isPending ? null : "AttachMoney"}
-          iconpos="right"
-          onClick={donate}
-        >
-          {isPending ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                lineHeight: "40px"
-              }}
-            >
-              <span style={{ marginRight: "10px" }}>Loading...</span>
-              <Loader size="40px" />
-            </div>
-          ) : (
-            <span>Claim Token</span>
-          )}
-        </DonateButton>
+        )}
       </ContentBox>
     </FormWrapper>
   );
