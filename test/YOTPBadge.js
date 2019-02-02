@@ -21,7 +21,7 @@ contract("YOTPBadge", accounts => {
     await badge.setBadgeLevelURI(2, GOLD_BADGE_HASH);
   });
 
-  const [owner, nonOwner, ...otherAccounts] = accounts;
+  const [owner, nonOwner, charityAccount, ...otherAccounts] = accounts;
 
   describe("deploying contract", () => {
     it("does not allow 0 value max supply", async () => {
@@ -35,14 +35,9 @@ contract("YOTPBadge", accounts => {
 
   describe("minting", () => {
     it("allows owner to mint tokens", async () => {
-      const result = await badge.mintTo(
-        nonOwner,
-        SILVER_DONATION_AMOUNT,
-        "DogeCharity",
-        {
-          from: owner
-        }
-      );
+      const result = await badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, {
+        from: owner
+      });
 
       truffleAssert.eventEmitted(
         result,
@@ -54,7 +49,7 @@ contract("YOTPBadge", accounts => {
 
     it("does not allow non-owner to mint tokens", async () => {
       await truffleAssert.fails(
-        badge.mintTo(owner, SILVER_DONATION_AMOUNT, "DogeCharity", {
+        badge.mintTo(owner, SILVER_DONATION_AMOUNT, {
           from: nonOwner
         }),
         truffleAssert.ErrorType.REVERT
@@ -63,19 +58,19 @@ contract("YOTPBadge", accounts => {
 
     it(`only allows maxSupply to be minted`, async () => {
       await truffleAssert.passes(
-        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, "DogeCharity", {
+        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, {
           from: owner
         })
       );
 
       await truffleAssert.passes(
-        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, "DogeCharity", {
+        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, {
           from: owner
         })
       );
 
       await truffleAssert.fails(
-        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, "DogeCharity", {
+        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, {
           from: owner
         }),
         truffleAssert.ErrorType.REVERT,
@@ -84,45 +79,72 @@ contract("YOTPBadge", accounts => {
     });
 
     it("sets badge level gold for 0.5 eth donations", async () => {
-      await badge.mintTo(nonOwner, GOLD_DONATION_AMOUNT, "DogeCharity", {
+      const results = await badge.mintTo(nonOwner, GOLD_DONATION_AMOUNT, {
         from: owner
       });
+
+      await truffleAssert.passes(results);
+
+      truffleAssert.eventEmitted(
+        results,
+        "LogMinted",
+        ev =>
+          ev.id.toNumber() === 1 &&
+          ev.owner === nonOwner &&
+          ev.badgeLevel.toNumber() === 2 &&
+          ev.tokenURI === GOLD_BADGE_HASH &&
+          ev.createdAt > 0,
+        "LogMinted should be emitted with correct data"
+      );
 
       const tokenURI = await badge.tokenURI.call(1);
       assert.equal(tokenURI, GOLD_BADGE_HASH);
-
-      const results = await badge.badgeInfos.call(1);
-      assert.equal(results.amount.toString(), GOLD_DONATION_AMOUNT);
-      assert.equal(results.charityId, "DogeCharity");
-      assert.equal(results.badgeLevel.toNumber(), 2);
     });
 
     it("sets badge level silver for 0.1 eth donations", async () => {
-      await badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, "DogeCharity", {
+      const results = await badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, {
         from: owner
       });
+
+      truffleAssert.passes(results);
+
+      truffleAssert.eventEmitted(
+        results,
+        "LogMinted",
+        ev =>
+          ev.id.toNumber() === 1 &&
+          ev.owner === nonOwner &&
+          ev.badgeLevel.toNumber() === 1 &&
+          ev.tokenURI === SILVER_BADGE_HASH &&
+          ev.createdAt > 0,
+        "LogMinted should be emitted with correct data"
+      );
 
       const tokenURI = await badge.tokenURI.call(1);
       assert.equal(tokenURI, SILVER_BADGE_HASH);
-
-      const results = await badge.badgeInfos.call(1);
-      assert.equal(results.amount.toString(), SILVER_DONATION_AMOUNT);
-      assert.equal(results.charityId, "DogeCharity");
-      assert.equal(results.badgeLevel.toNumber(), 1);
     });
 
     it("sets badge level bronze for any donation", async () => {
-      await badge.mintTo(nonOwner, 1, "DogeCharity", {
+      const results = await badge.mintTo(nonOwner, 1, {
         from: owner
       });
 
+      truffleAssert.passes(results);
+
+      truffleAssert.eventEmitted(
+        results,
+        "LogMinted",
+        ev =>
+          ev.id.toNumber() === 1 &&
+          ev.owner === nonOwner &&
+          ev.badgeLevel.toNumber() === 0 &&
+          ev.tokenURI === BRONZE_BADGE_HASH &&
+          ev.createdAt > 0,
+        "LogMinted should be emitted with correct data"
+      );
+
       const tokenURI = await badge.tokenURI.call(1);
       assert.equal(tokenURI, BRONZE_BADGE_HASH);
-
-      const results = await badge.badgeInfos.call(1);
-      assert.equal(results.amount.toString(), 1);
-      assert.equal(results.charityId, "DogeCharity");
-      assert.equal(results.badgeLevel.toNumber(), 0);
     });
   });
 

@@ -1,13 +1,11 @@
 pragma solidity ^0.5.1;
 
-
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Mintable.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
     uint maxSupply;
-    mapping(uint => BadgeInfo) public badgeInfos;
     mapping(uint => string) public badgeLevelURIs;
 
     constructor(uint _maxSupply)
@@ -20,13 +18,6 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
     }
 
     enum BadgeLevel { Bronze, Silver, Gold }
-
-    struct BadgeInfo {
-        uint amount;
-        string charityId;
-        BadgeLevel badgeLevel;
-        uint createdAt;
-    }
 
     /**
     * @dev Don't allow for minting more than maxSupply
@@ -41,17 +32,19 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
     */
     event LogMinted(
         uint indexed id,
-        string indexed tokenURI
+        address indexed owner,
+        BadgeLevel badgeLevel,
+        string tokenURI,
+        uint createdAt
     );
 
     /**
     * @dev Mints a a badge to a specified address
-    * @param _to address for the receiver of bage
+    * @param _to address for the receiver of badge
     */
     function mintTo(
         address _to,
-        uint _amount,
-        string memory _charityId
+        uint _amount
     )
         public
         onlyOwner
@@ -64,9 +57,8 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
 
         _mint(_to, newTokenId);
         _setTokenURI(newTokenId, badgeURI);
-        _setBadgeInfo(newTokenId, _amount, badgeLevel, _charityId);
 
-        emit LogMinted(newTokenId, badgeURI);
+        emit LogMinted(newTokenId, _to, badgeLevel, badgeURI, now);
 
         return newTokenId;
     }
@@ -121,33 +113,6 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
         return BadgeLevel.Bronze;
     }
 
-
-
-    /**
-    * @dev sets metadata info for a bage
-    * @param tokenId uint id of token created previously
-    * @param amount uint amount in wei that was donated to charity
-    * @param charityId string id of charity org to which donation was made
-    */
-    function _setBadgeInfo(
-        uint tokenId,
-        uint amount,
-        BadgeLevel badgeLevel,
-        string memory charityId
-    )
-        private
-    {
-        require(_exists(tokenId));
-
-        BadgeInfo memory badgeInfo = BadgeInfo(
-            amount,
-            charityId,
-            badgeLevel,
-            now
-        );
-
-        badgeInfos[tokenId] = badgeInfo;
-    }
 
     /**
     * @dev calculates the next token ID based on totalSupply

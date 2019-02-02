@@ -22,10 +22,12 @@ contract DonationManager {
      * @param from address the address of donator
      */
     event LogDonation(
-        string indexed charityName,
-        address charityAddress,
         uint indexed tokenId,
-        address indexed from
+        address indexed charityAddress,
+        address indexed from,
+        string charityName,
+        uint amount,
+        uint createdAt
     );
 
     /**
@@ -45,15 +47,16 @@ contract DonationManager {
 
         uint tokenId = trustedYTOPBage.mintTo(
             receiver,
-            msg.value,
-            charityName
+            msg.value
         );
 
         emit LogDonation(
-            charityName,
-            charityAddress,
             tokenId,
-            msg.sender
+            charityAddress,
+            msg.sender,
+            charityName,
+            msg.value,
+            now
         );
 
         charityAddress.transfer(msg.value);

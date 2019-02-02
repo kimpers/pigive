@@ -42,11 +42,26 @@ contract("DonationManager", accounts => {
 
   describe("donate", () => {
     it("allows a minimum donation of 0.008 ether", async () => {
-      await truffleAssert.passes(
-        donationsManager.donate(CHARITY_NAME, nonOwner, {
-          from: nonOwner,
-          value: web3.utils.toWei("0.008", "ether")
-        })
+      const donationWei = web3.utils.toWei("0.008", "ether");
+
+      const results = await donationsManager.donate(CHARITY_NAME, nonOwner, {
+        from: nonOwner,
+        value: donationWei
+      });
+
+      await truffleAssert.passes(results);
+
+      truffleAssert.eventEmitted(
+        results,
+        "LogDonation",
+        ev =>
+          ev.tokenId.toNumber() === 1 &&
+          ev.charityAddress === charityAccount &&
+          ev.from === nonOwner &&
+          ev.charityName === CHARITY_NAME &&
+          ev.amount.toString() === donationWei.toString() &&
+          ev.createdAt > 0,
+        "LogDonation should be emitted with correct data"
       );
     });
 
@@ -67,9 +82,11 @@ contract("DonationManager", accounts => {
         "ether"
       );
 
+      const donationWei = web3.utils.toWei("1", "ether");
+
       const results = await donationsManager.donate(CHARITY_NAME, nonOwner, {
         from: nonOwner,
-        value: web3.utils.toWei("1", "ether")
+        value: donationWei
       });
       const charityPostDonationBalance = web3.utils.fromWei(
         await web3.eth.getBalance(charityAccount),
@@ -77,7 +94,19 @@ contract("DonationManager", accounts => {
       );
 
       await truffleAssert.passes(results);
-      truffleAssert.eventEmitted(results, "LogDonation");
+
+      truffleAssert.eventEmitted(
+        results,
+        "LogDonation",
+        ev =>
+          ev.tokenId.toNumber() === 1 &&
+          ev.charityAddress === charityAccount &&
+          ev.from === nonOwner &&
+          ev.charityName === CHARITY_NAME &&
+          ev.amount.toString() === donationWei.toString() &&
+          ev.createdAt > 0,
+        "LogDonation should be emitted with correct data"
+      );
 
       assert.equal(
         charityPostDonationBalance - charityPreDonationBalance,
@@ -97,12 +126,14 @@ contract("DonationManager", accounts => {
 
       const otherAccount = otherAccounts[0];
 
+      const donationWei = web3.utils.toWei("1", "ether");
+
       const results = await donationsManager.donate(
         CHARITY_NAME,
         otherAccount,
         {
           from: nonOwner,
-          value: web3.utils.toWei("1", "ether")
+          value: donationWei
         }
       );
 
@@ -112,7 +143,19 @@ contract("DonationManager", accounts => {
       );
 
       await truffleAssert.passes(results);
-      truffleAssert.eventEmitted(results, "LogDonation");
+
+      truffleAssert.eventEmitted(
+        results,
+        "LogDonation",
+        ev =>
+          ev.tokenId.toNumber() === 1 &&
+          ev.charityAddress === charityAccount &&
+          ev.from === nonOwner &&
+          ev.charityName === CHARITY_NAME &&
+          ev.amount.toString() === donationWei.toString() &&
+          ev.createdAt > 0,
+        "LogDonation should be emitted with correct data"
+      );
 
       assert.equal(
         charityPostDonationBalance - charityPreDonationBalance,
