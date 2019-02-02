@@ -91,12 +91,13 @@ const filterActiveCharities = allEvents => {
 
 const DonationForm = ({
   donationContract,
+  donationLevel,
+  setDonationLevel,
   currentAccount,
   toWei,
   drizzleState
 }) => {
   const [charityName, setCharityName] = useState();
-  const [donationLevel, setDonationLevel] = useState("Bronze");
   const [donationAmount, setDonationAmount] = useState(0.008);
   const [receiverAccount, setReceiverAccount] = useState(currentAccount);
   const [donationKey, setDonationKey] = useState();
@@ -211,7 +212,7 @@ const DonationForm = ({
   );
 };
 
-export default () => (
+export default props => (
   <DrizzleContext.Consumer>
     {drizzleContext => {
       const { drizzle, drizzleState } = drizzleContext;
@@ -225,6 +226,7 @@ export default () => (
           drizzleState={drizzleState}
           currentAccount={currentAccount}
           toWei={toWei}
+          {...props}
         />
       );
     }}

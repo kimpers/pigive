@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { times, once, all } from "ramda";
 
 import { ReactComponent as FlagSvg } from "./Flag.svg";
+import { ReactComponent as AngelPigSvg } from "./AngelPig.svg";
+import { ReactComponent as BalloonPigSvg } from "./BalloonPig.svg";
+import { ReactComponent as RocketPigSvg } from "./RocketPig.svg";
+
 import planetPath from "./planet.png";
 import { device } from "../../constants";
 
@@ -11,7 +15,7 @@ const Flag = styled(FlagSvg)`
   width: 200px;
   bottom: 390px
   right: -50px;
-
+  z-index: 1;
   position: fixed;
   transform: rotate(10deg);
 
@@ -103,6 +107,18 @@ const RandomStars = once(() => {
   return times(GenerateStar, numStars);
 });
 
+const SpacePigContainer = styled.div`
+  width: 300px;
+  height: 300px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  top: 0px;
+  position: absolute;
+  z-index: 2;
+`;
+
 const Space = styled.div`
   height: 100%;
   background: linear-gradient(#01110a, #01110ab8);
@@ -115,24 +131,48 @@ const MainContentWrapper = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: 3;
   width: 50%;
   min-width: 375px;
   height: 500px;
 `;
 
-const Background = ({ children }) => (
-  <Space>
-    <Planet src={planetPath} />
-    <MainContentWrapper>{children}</MainContentWrapper>
+const Background = ({ children }) => {
+  const [donationLevel, setDonationLevel] = useState("Bronze");
 
-    <RandomStars />
-    <BackgroundContainer>
-      <Moon />
-    </BackgroundContainer>
-    <Flag />
-  </Space>
-);
+  let PigSvg;
+  if (donationLevel === "Gold") {
+    PigSvg = RocketPigSvg;
+  } else if (donationLevel === "Silver") {
+    PigSvg = AngelPigSvg;
+  } else {
+    PigSvg = BalloonPigSvg;
+  }
+
+  return (
+    <Space>
+      <Planet src={planetPath} />
+      <SpacePigContainer>
+        <PigSvg
+          style={{
+            width: "300px",
+            height: "300px"
+          }}
+        />
+      </SpacePigContainer>
+      <MainContentWrapper>
+        {React.Children.map(children, child =>
+          React.cloneElement(child, { donationLevel, setDonationLevel })
+        )}
+      </MainContentWrapper>
+      <RandomStars />
+      <BackgroundContainer>
+        <Moon />
+      </BackgroundContainer>
+      <Flag />
+    </Space>
+  );
+};
 
 const Moon = () => (
   <svg
