@@ -34,8 +34,9 @@ contract DonationManager {
      * @dev allows anyone to download to a charity and receive/give away a collectible ERC721 token
      * @param charityName string the identifier of charity for which to donate the ether sent
      * @param receiver address the address for whom to send the ERC721 token for the donation
+     * @param message string free text message from the donater
      */
-    function donate(string memory charityName, address receiver)
+    function donate(string memory charityName, address receiver, string memory message)
         payable
         public
     {
@@ -47,7 +48,8 @@ contract DonationManager {
 
         uint tokenId = trustedYTOPBage.mintTo(
             receiver,
-            msg.value
+            msg.value,
+            message
         );
 
         emit LogDonation(

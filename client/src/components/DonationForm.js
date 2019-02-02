@@ -152,6 +152,8 @@ const FormStep2 = ({
   isPending,
   receiverAccount,
   setReceiverAccount,
+  message,
+  setMessage,
   donate
 }) => (
   <Fragment>
@@ -166,7 +168,13 @@ const FormStep2 = ({
     </Flex>
     <Flex flexDirection="column">
       <FormText>Message</FormText>
-      <Textarea rows={4} disabled={isPending} style={{ resize: "none" }} />
+      <Textarea
+        rows={4}
+        value={message}
+        onChange={e => setMessage(e.target.value)}
+        disabled={isPending}
+        style={{ resize: "none" }}
+      />
     </Flex>
     <FormButton
       disabled={isPending}
@@ -212,6 +220,7 @@ const DonationForm = ({
     const donationKey = donationContract.methods.donate.cacheSend(
       charityName,
       receiverAccount,
+      message,
       { value: toWei(donationAmount) }
     );
 

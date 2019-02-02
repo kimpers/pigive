@@ -18,6 +18,18 @@ const CONTRACT_DEPLOYMENT_BLOCK =
 const options = {
   contracts: [YOTPBadge, Charities, DonationManager],
   events: {
+    YOTPBadge: [
+      {
+        eventName: "LogMinted",
+        eventOptions: { fromBlock: CONTRACT_DEPLOYMENT_BLOCK }
+      }
+    ],
+    DonationManager: [
+      {
+        eventName: "LogDonation",
+        eventOptions: { fromBlock: CONTRACT_DEPLOYMENT_BLOCK }
+      }
+    ],
     Charities: [
       {
         eventName: "LogCharityAdded",

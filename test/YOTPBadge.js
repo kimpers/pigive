@@ -12,6 +12,8 @@ const BRONZE_BADGE_HASH = "BRONZE";
 const SILVER_BADGE_HASH = "SILVER";
 const GOLD_BADGE_HASH = "GOLD";
 
+const MESSAGE = "HELLO WORLD";
+
 contract("YOTPBadge", accounts => {
   let badge;
   beforeEach(async () => {
@@ -35,9 +37,14 @@ contract("YOTPBadge", accounts => {
 
   describe("minting", () => {
     it("allows owner to mint tokens", async () => {
-      const result = await badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, {
-        from: owner
-      });
+      const result = await badge.mintTo(
+        nonOwner,
+        SILVER_DONATION_AMOUNT,
+        MESSAGE,
+        {
+          from: owner
+        }
+      );
 
       truffleAssert.eventEmitted(
         result,
@@ -49,7 +56,7 @@ contract("YOTPBadge", accounts => {
 
     it("does not allow non-owner to mint tokens", async () => {
       await truffleAssert.fails(
-        badge.mintTo(owner, SILVER_DONATION_AMOUNT, {
+        badge.mintTo(owner, SILVER_DONATION_AMOUNT, MESSAGE, {
           from: nonOwner
         }),
         truffleAssert.ErrorType.REVERT
@@ -58,19 +65,19 @@ contract("YOTPBadge", accounts => {
 
     it(`only allows maxSupply to be minted`, async () => {
       await truffleAssert.passes(
-        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, {
+        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, MESSAGE, {
           from: owner
         })
       );
 
       await truffleAssert.passes(
-        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, {
+        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, MESSAGE, {
           from: owner
         })
       );
 
       await truffleAssert.fails(
-        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, {
+        badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, MESSAGE, {
           from: owner
         }),
         truffleAssert.ErrorType.REVERT,
@@ -79,9 +86,14 @@ contract("YOTPBadge", accounts => {
     });
 
     it("sets badge level gold for 0.5 eth donations", async () => {
-      const results = await badge.mintTo(nonOwner, GOLD_DONATION_AMOUNT, {
-        from: owner
-      });
+      const results = await badge.mintTo(
+        nonOwner,
+        GOLD_DONATION_AMOUNT,
+        MESSAGE,
+        {
+          from: owner
+        }
+      );
 
       await truffleAssert.passes(results);
 
@@ -93,6 +105,7 @@ contract("YOTPBadge", accounts => {
           ev.owner === nonOwner &&
           ev.badgeLevel.toNumber() === 2 &&
           ev.tokenURI === GOLD_BADGE_HASH &&
+          ev.message === MESSAGE &&
           ev.createdAt > 0,
         "LogMinted should be emitted with correct data"
       );
@@ -102,9 +115,14 @@ contract("YOTPBadge", accounts => {
     });
 
     it("sets badge level silver for 0.1 eth donations", async () => {
-      const results = await badge.mintTo(nonOwner, SILVER_DONATION_AMOUNT, {
-        from: owner
-      });
+      const results = await badge.mintTo(
+        nonOwner,
+        SILVER_DONATION_AMOUNT,
+        MESSAGE,
+        {
+          from: owner
+        }
+      );
 
       truffleAssert.passes(results);
 
@@ -116,6 +134,7 @@ contract("YOTPBadge", accounts => {
           ev.owner === nonOwner &&
           ev.badgeLevel.toNumber() === 1 &&
           ev.tokenURI === SILVER_BADGE_HASH &&
+          ev.message === MESSAGE &&
           ev.createdAt > 0,
         "LogMinted should be emitted with correct data"
       );
@@ -125,7 +144,7 @@ contract("YOTPBadge", accounts => {
     });
 
     it("sets badge level bronze for any donation", async () => {
-      const results = await badge.mintTo(nonOwner, 1, {
+      const results = await badge.mintTo(nonOwner, 1, MESSAGE, {
         from: owner
       });
 
@@ -139,6 +158,7 @@ contract("YOTPBadge", accounts => {
           ev.owner === nonOwner &&
           ev.badgeLevel.toNumber() === 0 &&
           ev.tokenURI === BRONZE_BADGE_HASH &&
+          ev.message === MESSAGE &&
           ev.createdAt > 0,
         "LogMinted should be emitted with correct data"
       );

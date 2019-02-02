@@ -16,6 +16,8 @@ const GOLD_BADGE_HASH = "GOLD";
 
 const CHARITY_NAME = "DogeCharity";
 
+const MESSAGE = "HELLO WORLD";
+
 contract("DonationManager", accounts => {
   const [owner, nonOwner, charityAccount, ...otherAccounts] = accounts;
 
@@ -44,10 +46,15 @@ contract("DonationManager", accounts => {
     it("allows a minimum donation of 0.008 ether", async () => {
       const donationWei = web3.utils.toWei("0.008", "ether");
 
-      const results = await donationsManager.donate(CHARITY_NAME, nonOwner, {
-        from: nonOwner,
-        value: donationWei
-      });
+      const results = await donationsManager.donate(
+        CHARITY_NAME,
+        nonOwner,
+        MESSAGE,
+        {
+          from: nonOwner,
+          value: donationWei
+        }
+      );
 
       await truffleAssert.passes(results);
 
@@ -67,7 +74,7 @@ contract("DonationManager", accounts => {
 
     it("does not allow donation of less than 0.008 ether", async () => {
       await truffleAssert.fails(
-        donationsManager.donate(CHARITY_NAME, nonOwner, {
+        donationsManager.donate(CHARITY_NAME, nonOwner, MESSAGE, {
           from: nonOwner,
           value: web3.utils.toWei("0.007", "ether")
         }),
@@ -84,10 +91,15 @@ contract("DonationManager", accounts => {
 
       const donationWei = web3.utils.toWei("1", "ether");
 
-      const results = await donationsManager.donate(CHARITY_NAME, nonOwner, {
-        from: nonOwner,
-        value: donationWei
-      });
+      const results = await donationsManager.donate(
+        CHARITY_NAME,
+        nonOwner,
+        MESSAGE,
+        {
+          from: nonOwner,
+          value: donationWei
+        }
+      );
       const charityPostDonationBalance = web3.utils.fromWei(
         await web3.eth.getBalance(charityAccount),
         "ether"
@@ -131,6 +143,7 @@ contract("DonationManager", accounts => {
       const results = await donationsManager.donate(
         CHARITY_NAME,
         otherAccount,
+        MESSAGE,
         {
           from: nonOwner,
           value: donationWei
@@ -169,7 +182,7 @@ contract("DonationManager", accounts => {
 
     it("does not allow donations after max supply of badge has been reached", async () => {
       await truffleAssert.passes(
-        donationsManager.donate(CHARITY_NAME, nonOwner, {
+        donationsManager.donate(CHARITY_NAME, nonOwner, MESSAGE, {
           from: nonOwner,
           value: web3.utils.toWei("1", "ether")
         })
@@ -178,7 +191,7 @@ contract("DonationManager", accounts => {
       assert.equal(await badge.ownerOf.call(1), nonOwner);
 
       await truffleAssert.passes(
-        donationsManager.donate(CHARITY_NAME, otherAccounts[0], {
+        donationsManager.donate(CHARITY_NAME, otherAccounts[0], MESSAGE, {
           from: nonOwner,
           value: web3.utils.toWei("1", "ether")
         })
@@ -187,7 +200,7 @@ contract("DonationManager", accounts => {
       assert.equal(await badge.ownerOf.call(2), otherAccounts[0]);
 
       await truffleAssert.fails(
-        donationsManager.donate(CHARITY_NAME, nonOwner, {
+        donationsManager.donate(CHARITY_NAME, nonOwner, MESSAGE, {
           from: nonOwner,
           value: web3.utils.toWei("1", "ether")
         }),

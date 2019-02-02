@@ -35,16 +35,20 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
         address indexed owner,
         BadgeLevel badgeLevel,
         string tokenURI,
+        string message,
         uint createdAt
     );
 
     /**
     * @dev Mints a a badge to a specified address
-    * @param _to address for the receiver of badge
+    * @param to address for the receiver of badge
+    * @param amount uint donation amount
+    * @param message string
     */
     function mintTo(
-        address _to,
-        uint _amount
+        address to,
+        uint amount,
+        string memory message
     )
         public
         onlyOwner
@@ -52,13 +56,13 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
         returns (uint)
     {
         uint256 newTokenId = _getNextTokenId();
-        BadgeLevel badgeLevel = _getBadgeLevel(_amount);
+        BadgeLevel badgeLevel = _getBadgeLevel(amount);
         string memory badgeURI = getBadgeLevelURI(badgeLevel);
 
-        _mint(_to, newTokenId);
+        _mint(to, newTokenId);
         _setTokenURI(newTokenId, badgeURI);
 
-        emit LogMinted(newTokenId, _to, badgeLevel, badgeURI, now);
+        emit LogMinted(newTokenId, to, badgeLevel, badgeURI, message, now);
 
         return newTokenId;
     }
