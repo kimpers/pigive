@@ -5,8 +5,8 @@ import truffleAssert from "truffle-assertions";
 
 const MAX_SUPPLY = 2;
 
-const SILVER_DONATION_AMOUNT = "100000000000000000";
-const GOLD_DONATION_AMOUNT = "500000000000000000";
+const SILVER_DONATION_AMOUNT = web3.utils.toWei("0.088", "ether");
+const GOLD_DONATION_AMOUNT = web3.utils.toWei("0.888", "ether");
 
 const BRONZE_BADGE_HASH = "BRONZE";
 const SILVER_BADGE_HASH = "SILVER";

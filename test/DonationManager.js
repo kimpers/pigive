@@ -41,6 +41,26 @@ contract("DonationManager", accounts => {
   });
 
   describe("donate", () => {
+    it("allows a minimum donation of 0.008 ether", async () => {
+      await truffleAssert.passes(
+        donationsManager.donate(CHARITY_NAME, nonOwner, {
+          from: nonOwner,
+          value: web3.utils.toWei("0.008", "ether")
+        })
+      );
+    });
+
+    it("does not allow donation of less than 0.008 ether", async () => {
+      await truffleAssert.fails(
+        donationsManager.donate(CHARITY_NAME, nonOwner, {
+          from: nonOwner,
+          value: web3.utils.toWei("0.007", "ether")
+        }),
+        truffleAssert.ErrorType.REVERT,
+        "0.008 ether min donation"
+      );
+    });
+
     it("allows non-owner to donate to charity and receive token", async () => {
       const charityPreDonationBalance = web3.utils.fromWei(
         await web3.eth.getBalance(charityAccount),

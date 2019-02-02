@@ -37,7 +37,7 @@ contract DonationManager {
         payable
         public
     {
-        require(msg.value > 0, "0 donation");
+        require(msg.value >= 8 finney, "0.008 ether min donation");
         require(receiver != address(0x0), "invalid receiver");
 
         address payable charityAddress = trustedCharities.getCharityAddressByName(charityName);

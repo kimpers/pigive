@@ -110,11 +110,11 @@ contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
         private
         returns (BadgeLevel)
     {
-        // 0.5 eth for gold badge level donation
-        if (amount >= 500000000000000000) {
+        // 0.888 ether for gold badge level donation
+        if (amount >= 888 finney) {
             return BadgeLevel.Gold;
-        // 0.1 eth for silver badge level donation
-        } else if (amount >= 100000000000000000) {
+        // 0.088 ether for silver badge level donation
+        } else if (amount >= 88 finney) {
             return BadgeLevel.Silver;
         }
 
