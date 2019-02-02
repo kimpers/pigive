@@ -51,8 +51,8 @@ const FormInput = styled(Input)`
 `;
 
 const DonateButton = styled(Button)`
-  background-color: #d1ccc9;
-  color: #333;
+  background-color: #aa381e
+  color: #ffd700;
   width: 100%;
   margin-top: 10px;
 
@@ -61,7 +61,8 @@ const DonateButton = styled(Button)`
   }
 
   :hover {
-    background-color: white;
+    background-color: #ffd700;
+    color: #aa381e
   }
 `;
 
