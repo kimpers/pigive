@@ -209,4 +209,12 @@ contract("DonationManager", accounts => {
       );
     });
   });
+
+  describe("pausable", () => {
+    it.skip("should allow owner to pause", async () => {});
+    it.skip("should not nonOwner to pause", async () => {});
+    it.skip("should not allow donations when paused", async () => {});
+    it.skip("should allow owner to resume", async () => {});
+    it.skip("should not allow nonOwner to resume", async () => {});
+  });
 });

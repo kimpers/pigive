@@ -1,9 +1,11 @@
 pragma solidity ^0.5.1;
 
+import 'openzeppelin-solidity/contracts/lifecycle/Pausable.sol';
+
 import './YOTPBadge.sol';
 import './Charities.sol';
 
-contract DonationManager {
+contract DonationManager is Pausable {
     YOTPBadge private trustedYTOPBage;
     Charities private trustedCharities;
 
@@ -38,6 +40,7 @@ contract DonationManager {
      */
     function donate(string memory charityName, address receiver, string memory message)
         payable
+        whenNotPaused
         public
     {
         require(msg.value >= 8 finney, "0.008 ether min donation");
