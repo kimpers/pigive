@@ -142,18 +142,26 @@ const MessageText = styled(Text)`
   z-index: 1;
 `;
 
+const PigForDonation = ({ donationLevel }) => {
+  switch (donationLevel) {
+    case "Gold":
+      return (
+        <RocketPigSvg style={{ width: "250px", height: "250px", zIndex: 1 }} />
+      );
+    case "Silver":
+      return (
+        <AngelPigSvg style={{ width: "250px", height: "250px", zIndex: 1 }} />
+      );
+    default:
+      return (
+        <BalloonPigSvg style={{ width: "300px", height: "300px", zIndex: 1 }} />
+      );
+  }
+};
+
 const Background = ({ children }) => {
   const [donationLevel, setDonationLevel] = useState("Bronze");
   const [message, setMessage] = useState();
-
-  let PigSvg;
-  if (donationLevel === "Gold") {
-    PigSvg = RocketPigSvg;
-  } else if (donationLevel === "Silver") {
-    PigSvg = AngelPigSvg;
-  } else {
-    PigSvg = BalloonPigSvg;
-  }
 
   const displayMessage = isNil(message) ? DEFAULT_MESSAGE : message;
 
@@ -163,7 +171,7 @@ const Background = ({ children }) => {
         <Planet src={planetPath} />
         <RandomStars />
         <SpacePigContainer>
-          <PigSvg style={{ width: "300px", height: "300px", zIndex: 1 }} />
+          <PigForDonation donationLevel={donationLevel} />
           <MessageText>{displayMessage}</MessageText>
         </SpacePigContainer>
       </SpaceArea>
