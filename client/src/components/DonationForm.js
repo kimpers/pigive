@@ -15,8 +15,6 @@ import {
   Textarea
 } from "rimble-ui";
 
-import { device } from "../constants";
-
 const FormSelect = styled(Select)`
   color: #333;
   width: 100%;
@@ -31,11 +29,6 @@ const FormWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding 15px;
-
-  @media ${device.mobile} {
-    background-color: #fff8f0;
-  }
-
 `;
 
 const FormHeading = styled(Heading.h2)`
@@ -255,7 +248,7 @@ const DonationForm = ({
   return (
     <FormWrapper>
       <ContentBox>
-        <FormHeading>Donate to receive your collectible</FormHeading>
+        <FormHeading>PiGive - Give & Get</FormHeading>
         {formStep === 1 ? (
           <FormStep1
             activeCharities={activeCharities}

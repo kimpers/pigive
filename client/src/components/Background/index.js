@@ -13,41 +13,13 @@ import { device } from "../../constants";
 
 const DEFAULT_MESSAGE =
   "Bacon ipsum dolor amet corned beef cow tri-tip strip steak capicola alcatra venison cupim. Meatball turkey beef venison, tri-tip jowl kevin pork ribeye pastrami drumstick tongue meatloaf prosciutto buffalo.";
-const Flag = styled(FlagSvg)`
-  position: absolute;
-  height: 200px
-  width: 200px;
-  bottom: 80%;
-  right: 0;
-  z-index: 1;
-  transform: rotate(10deg);
-
-  @media ${device.desktop} {
-    height: 400px
-    width: 400px;
-    bottom: 70%;
-  }
-
-  @media (max-width: 310px) {
-    display: none;
-  }
-`;
-
-const BackgroundContainer = styled.div`
-  max-height: 50%;
-  width: 100%;
-  position: absolute;
-  bottom: -10px;
-`;
 
 const Planet = styled.img`
-  position: absolute;
-  right: 100px;
   width: 150px;
-  top: 10px;
-  z-index: 1;
+  height: 150px;
+  align-self: flex-end;
 
-  @media (max-width: 310px) {
+  @media ${device.mobile} {
     display: none;
   }
 `;
@@ -90,7 +62,8 @@ const RandomStars = once(() => {
           opacity: `${opacity}`,
           background: "#fff",
           borderRadius: "50%",
-          position: "absolute"
+          position: "absolute",
+          zIndex: 0
         }}
       />
     );
@@ -103,39 +76,58 @@ const RandomStars = once(() => {
 
 const SpacePigContainer = styled.div`
   display: flex;
-  width: 600px;
-  height: 300px;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  top: 15%;
-  position: absolute;
-  z-index: 2;
-`;
-
-const PigWrapper = styled.div`
-  width: 300px;
-  height: 300px;
-  margin: auto;
+  justify-content: center;
 `;
 
 const Space = styled.div`
   height: 100%;
+  display: flex;
+  flex-direction: column;
   background: linear-gradient(#01110a, #01110ab8);
 `;
 
-const MainContentWrapper = styled.div`
+const SpaceArea = styled.div`
+  flex-grow: 1;
+  margin: 30px;
+`;
+
+const Flag = styled(FlagSvg)`
+  height: 200px
+  width: 200px;
+  transform: rotate(10deg);
   position: absolute;
-  margin-left: auto;
-  margin-right: auto;
-  left: 0;
   right: 0;
-  bottom: 0;
-  z-index: 3;
-  width: 50%;
-  min-width: 375px;
-  height: 500px;
+  top: -100px;
+  z-index: 1;
+
+  /* Hack to position flag on very wide screens */
+  @media (min-width: 1200px) {
+    top: -200px;
+    height: 400px;
+    width: 400px;
+  }
+
+  @media (min-width: 2500px) {
+    top: -120px;
+  }
+
+  @media ${device.mobile} {
+    display: none;
+  }
+`;
+
+const MoonArea = styled.div`
+  width: 100%;
+  max-height: 420px;
+  position: relative;
+`;
+
+const MoonContentArea = styled.div`
+  position: absolute;
+  width: 100%;
+  @media ${device.mobile} {
+    background-color: #fff8f0;
+  }
 `;
 
 const MessageText = styled(Text)`
@@ -145,6 +137,7 @@ const MessageText = styled(Text)`
   margin-left: 15px;
   -webkit-font-smoothing: antialiased;
   font-weight: bold;
+  z-index: 1;
 `;
 
 const Background = ({ children }) => {
@@ -164,36 +157,34 @@ const Background = ({ children }) => {
 
   return (
     <Space>
-      <Planet src={planetPath} />
-      <SpacePigContainer>
-        <PigWrapper>
-          <PigSvg style={{ width: "100%", height: "100%" }} />
-        </PigWrapper>
-        <MessageText>{displayMessage}</MessageText>
-      </SpacePigContainer>
-      <MainContentWrapper>
-        {React.Children.map(children, child =>
-          React.cloneElement(child, {
-            donationLevel,
-            setDonationLevel,
-            message,
-            setMessage
-          })
-        )}
-      </MainContentWrapper>
-      <RandomStars />
-      <BackgroundContainer>
-        <Moon>
-          <Flag />
-        </Moon>
-      </BackgroundContainer>
+      <SpaceArea>
+        <Planet src={planetPath} />
+        <RandomStars />
+        <SpacePigContainer>
+          <PigSvg style={{ width: "300px", height: "300px", zIndex: 1 }} />
+          <MessageText>{displayMessage}</MessageText>
+        </SpacePigContainer>
+      </SpaceArea>
+      <MoonArea>
+        <MoonContentArea>
+          {React.Children.map(children, child =>
+            React.cloneElement(child, {
+              donationLevel,
+              setDonationLevel,
+              message,
+              setMessage
+            })
+          )}
+        </MoonContentArea>
+        <Moon />
+        <Flag />
+      </MoonArea>
     </Space>
   );
 };
 
-const Moon = ({ children }) => (
-  <div>
-    {children}
+const Moon = () => (
+  <div style={{ maxHeight: "420px", overflow: "hidden" }}>
     <svg
       version="1.1"
       id="Layer_1"
