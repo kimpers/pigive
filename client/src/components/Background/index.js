@@ -11,13 +11,13 @@ import { ReactComponent as RocketPigSvg } from "./RocketPig.svg";
 import planetPath from "./planet.png";
 import { device } from "../../constants";
 
-const DEFAULT_MESSAGE =
-  "Bacon ipsum dolor amet corned beef cow tri-tip strip steak capicola alcatra venison cupim. Meatball turkey beef venison, tri-tip jowl kevin pork ribeye pastrami drumstick tongue meatloaf prosciutto buffalo.";
+const DEFAULT_MESSAGE = "Make the world a better place, one pig at a time!";
 
 const Planet = styled.img`
   width: 150px;
   height: 150px;
   align-self: flex-end;
+  z-index: 1;
 
   @media ${device.mobile} {
     display: none;
@@ -91,6 +91,7 @@ const SpaceArea = styled.div`
   display: flex;
   flex-direction: column;
   margin: 30px;
+  min-height: 450px;
 `;
 
 const Flag = styled(FlagSvg)`
