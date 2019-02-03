@@ -11,6 +11,7 @@ import {
   Button,
   Select,
   Flex,
+  Box,
   Loader,
   Textarea
 } from "rimble-ui";
@@ -147,6 +148,7 @@ const FormStep2 = ({
   setReceiverAccount,
   message,
   setMessage,
+  setFormStep,
   donate
 }) => (
   <Fragment>
@@ -169,27 +171,40 @@ const FormStep2 = ({
         style={{ resize: "none" }}
       />
     </Flex>
-    <FormButton
-      disabled={isPending}
-      icon={isPending ? null : "AttachMoney"}
-      iconpos="right"
-      onClick={donate}
-    >
-      {isPending ? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            lineHeight: "40px"
-          }}
+    <Flex>
+      <Box width={1 / 3} mr="5px">
+        <FormButton
+          disabled={isPending}
+          icon="ArrowBack"
+          onClick={() => setFormStep(1)}
         >
-          <span style={{ marginRight: "10px" }}>Loading...</span>
-          <Loader size="40px" />
-        </div>
-      ) : (
-        <span>Claim Token</span>
-      )}
-    </FormButton>
+          Back
+        </FormButton>
+      </Box>
+      <Box width={2 / 3}>
+        <FormButton
+          disabled={isPending}
+          icon={isPending ? null : "AttachMoney"}
+          iconpos="right"
+          onClick={donate}
+        >
+          {isPending ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                lineHeight: "40px"
+              }}
+            >
+              <span style={{ marginRight: "10px" }}>Loading...</span>
+              <Loader size="40px" />
+            </div>
+          ) : (
+            <span>Claim Token</span>
+          )}
+        </FormButton>
+      </Box>
+    </Flex>
   </Fragment>
 );
 
@@ -267,6 +282,7 @@ const DonationForm = ({
             setReceiverAccount={setReceiverAccount}
             message={message}
             setMessage={setMessage}
+            setFormStep={setFormStep}
             donate={donate}
           />
         )}

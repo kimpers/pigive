@@ -88,6 +88,8 @@ const Space = styled.div`
 
 const SpaceArea = styled.div`
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
   margin: 30px;
 `;
 
