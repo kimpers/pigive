@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { times, once, all } from "ramda";
+import { times, once, all, isNil } from "ramda";
+import { Text } from "rimble-ui";
 
 import { ReactComponent as FlagSvg } from "./Flag.svg";
 import { ReactComponent as AngelPigSvg } from "./AngelPig.svg";
@@ -10,6 +11,8 @@ import { ReactComponent as RocketPigSvg } from "./RocketPig.svg";
 import planetPath from "./planet.png";
 import { device } from "../../constants";
 
+const DEFAULT_MESSAGE =
+  "Bacon ipsum dolor amet corned beef cow tri-tip strip steak capicola alcatra venison cupim. Meatball turkey beef venison, tri-tip jowl kevin pork ribeye pastrami drumstick tongue meatloaf prosciutto buffalo.";
 const Flag = styled(FlagSvg)`
   position: absolute;
   height: 200px
@@ -74,7 +77,7 @@ const RandomStars = once(() => {
     const top = getUniqueRandom(prevTop, 50, 5);
     const left = getUniqueRandom(prevLeft, 90, 5);
     const size = Math.floor(Math.random() * 10) + 10;
-    const opacity = Math.min(Math.random() + 0.2, 1);
+    const opacity = Math.min(Math.random() + 0.2, 0.9);
 
     return (
       <div
@@ -99,7 +102,8 @@ const RandomStars = once(() => {
 });
 
 const SpacePigContainer = styled.div`
-  width: 300px;
+  display: flex;
+  width: 600px;
   height: 300px;
   left: 0;
   right: 0;
@@ -108,6 +112,12 @@ const SpacePigContainer = styled.div`
   top: 15%;
   position: absolute;
   z-index: 2;
+`;
+
+const PigWrapper = styled.div`
+  width: 300px;
+  height: 300px;
+  margin: auto;
 `;
 
 const Space = styled.div`
@@ -128,8 +138,18 @@ const MainContentWrapper = styled.div`
   height: 500px;
 `;
 
+const MessageText = styled(Text)`
+  color: #ffd700;
+  align-self: center;
+  width: 300px;
+  margin-left: 15px;
+  -webkit-font-smoothing: antialiased;
+  font-weight: bold;
+`;
+
 const Background = ({ children }) => {
   const [donationLevel, setDonationLevel] = useState("Bronze");
+  const [message, setMessage] = useState();
 
   let PigSvg;
   if (donationLevel === "Gold") {
@@ -140,20 +160,25 @@ const Background = ({ children }) => {
     PigSvg = BalloonPigSvg;
   }
 
+  const displayMessage = isNil(message) ? DEFAULT_MESSAGE : message;
+
   return (
     <Space>
       <Planet src={planetPath} />
       <SpacePigContainer>
-        <PigSvg
-          style={{
-            width: "100%",
-            height: "100%"
-          }}
-        />
+        <PigWrapper>
+          <PigSvg style={{ width: "100%", height: "100%" }} />
+        </PigWrapper>
+        <MessageText>{displayMessage}</MessageText>
       </SpacePigContainer>
       <MainContentWrapper>
         {React.Children.map(children, child =>
-          React.cloneElement(child, { donationLevel, setDonationLevel })
+          React.cloneElement(child, {
+            donationLevel,
+            setDonationLevel,
+            message,
+            setMessage
+          })
         )}
       </MainContentWrapper>
       <RandomStars />

@@ -204,6 +204,8 @@ const DonationForm = ({
   donationContract,
   donationLevel,
   setDonationLevel,
+  message,
+  setMessage,
   currentAccount,
   toWei,
   drizzleState
@@ -214,7 +216,6 @@ const DonationForm = ({
   const [donationKey, setDonationKey] = useState();
   const [donationStatus, setDonationStatus] = useState();
   const [formStep, setFormStep] = useState(1);
-  const [message, setMessage] = useState("");
 
   const donate = () => {
     const donationKey = donationContract.methods.donate.cacheSend(
