@@ -2,9 +2,10 @@ const YOTPBadge = artifacts.require("./YOTPBadge.sol");
 const Charities = artifacts.require("./Charities.sol");
 const DonationManager = artifacts.require("./DonationManager.sol");
 
-const BRONZE_BADGE_HASH = "QmSxYpNMndhe5dU9NL9T6i8NC71rJUBxeGC9FHxBjjRBp2";
-const SILVER_BADGE_HASH = "QmXzyWg5p9gwY2RsTyucKXn6RA3XiJCf5tGJtoa6ohTp7A";
-const GOLD_BADGE_HASH = "QmViLm7byhkc6DDQUjry8zqs8KfhtL1u7m7o5ETqpkTaHi";
+// TODO: UPDATE THESE
+const BRONZE_BADGE_HASH = "QmYhuAS2R8S45bxGE3HT49mTmmPUqXotE4wTonDSLkFHjH";
+const SILVER_BADGE_HASH = "QmZ7kXE3ww3j3542ArK5awSPmXjhQcanZ7tr58DohrVLTU";
+const GOLD_BADGE_HASH = "QmWEBryUXhkm5aV8giSre58PT7k3Eap8qGVhWwWiGVyhTR";
 
 const MAX_SUPPLY = process.env.MAX_SUPPLY || 10;
 
