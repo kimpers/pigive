@@ -7,6 +7,8 @@ import { ReactComponent as FlagSvg } from "./Flag.svg";
 import { ReactComponent as AngelPigSvg } from "./AngelPig.svg";
 import { ReactComponent as BalloonPigSvg } from "./BalloonPig.svg";
 import { ReactComponent as RocketPigSvg } from "./RocketPig.svg";
+import { ReactComponent as LogoSvg } from "./PigiveLogo.svg";
+import { ReactComponent as MoonFooterSlopeSvg } from "./MoonFooterSlope.svg";
 
 import planetPath from "./planet.png";
 import { device } from "../../constants";
@@ -143,6 +145,33 @@ const MessageText = styled(Text)`
   z-index: 1;
 `;
 
+const FooterContentWrapper = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  height: 130px;
+
+  @media ${device.mobile} {
+    display: none;
+  }
+`;
+
+const Footer = () => (
+  <FooterContentWrapper>
+    <LogoSvg
+      style={{
+        height: "30px",
+        width: "130px",
+        position: "absolute",
+        left: "10px",
+        bottom: "8px"
+      }}
+    />
+    <MoonFooterSlopeSvg style={{ height: "140px", width: "300px" }} />
+  </FooterContentWrapper>
+);
+
 const PigForDonation = ({ donationLevel }) => {
   switch (donationLevel) {
     case "Gold":
@@ -189,6 +218,7 @@ const Background = ({ children }) => {
         </MoonContentArea>
         <Moon />
         <Flag />
+        <Footer />
       </MoonArea>
     </Space>
   );
