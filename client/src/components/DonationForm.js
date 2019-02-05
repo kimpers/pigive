@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
 import styled from "styled-components";
-import { isNil } from "ramda";
+import { isNil, uniqBy } from "ramda";
 import idx from "idx";
 import { DrizzleContext } from "drizzle-react";
 import { toast } from "react-toastify";
@@ -58,6 +58,7 @@ const FormButton = styled(Button)`
   color: #ffd700;
   width: 100%;
   margin-top: 10px;
+  z-index: 1;
 
   & > svg:last-child {
     margin-left: 0px;
@@ -88,9 +89,12 @@ const filterActiveCharities = allEvents => {
     allEvents.filter(e => e.event === "LogCharityRemoved")
   );
 
-  return charitiyAddedEvents
-    .filter(e => !removedCharities.has(e.event))
-    .map(c => c.returnValues);
+  return uniqBy(
+    c => c.name,
+    charitiyAddedEvents
+      .filter(e => !removedCharities.has(e.event))
+      .map(c => c.returnValues)
+  );
 };
 
 const FormStep1 = ({
@@ -115,28 +119,20 @@ const FormStep1 = ({
     <Flex flexDirection="column">
       <FormText>Select donation level</FormText>
       <FormSelect
-        items={["Bronze", "Silver", "Gold", "Custom"]}
+        items={["Bronze", "Silver", "Gold"]}
         value={donationLevel}
         onChange={e => {
           const level = e.target.value;
           const amount = donationLevelMapping[level];
 
           setDonationLevel(level);
-          if (amount && level !== "Custom") {
-            setDonationAmount(amount);
-          }
+          setDonationAmount(amount);
         }}
       />
     </Flex>
     <Flex flexDirection="column">
       <FormText>Amount (in ETH)</FormText>
-      <FormInput
-        type="number"
-        step={0.01}
-        value={donationAmount}
-        onChange={e => setDonationAmount(e.target.value)}
-        disabled={donationLevel !== "Custom"}
-      />
+      <FormInput type="number" value={donationAmount} disabled />
     </Flex>
     <FormButton onClick={() => setFormStep(2)}>Continue</FormButton>
   </Fragment>
@@ -225,11 +221,20 @@ const DonationForm = ({
   const [donationStatus, setDonationStatus] = useState();
   const [formStep, setFormStep] = useState(1);
 
+  const clearForm = () => {
+    setCharityName(activeCharities[0].name);
+    setDonationAmount(0.008);
+    setReceiverAccount(currentAccount);
+    setDonationLevel("Bronze");
+    setMessage();
+    setFormStep(1);
+  };
+
   const donate = () => {
     const donationKey = donationContract.methods.donate.cacheSend(
       charityName,
       receiverAccount,
-      message,
+      message || "",
       { value: toWei(donationAmount) }
     );
 
@@ -249,8 +254,10 @@ const DonationForm = ({
 
     if (donationStatus === "pending" && status === "success") {
       toast.success(`Donation successful!`);
+      clearForm();
     } else if (donationStatus === "pending" && status === "error") {
       toast.error("Something went wrong.");
+      clearForm();
     }
 
     if (donationStatus !== status) {

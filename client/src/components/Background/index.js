@@ -13,7 +13,8 @@ import { ReactComponent as MoonFooterSlopeSvg } from "./MoonFooterSlope.svg";
 import planetPath from "./planet.png";
 import { device } from "../../constants";
 
-const DEFAULT_MESSAGE = "Make the world a better place, one pig at a time!";
+const DEFAULT_MESSAGE =
+  "It's the year of the pig and we want to celebrate that by helping those in need.\nBy donating to a charity of your liking, you will receive a limited edition ERC720 collectible as a thank you.\nMake the world a better place, one pig at a time.";
 
 const Planet = styled.img`
   width: 150px;
@@ -51,7 +52,7 @@ const RandomStars = once(() => {
     const top = getUniqueRandom(prevTop, 50, 5);
     const left = getUniqueRandom(prevLeft, 90, 5);
     const size = Math.floor(Math.random() * 10) + 10;
-    const opacity = Math.min(Math.random() + 0.2, 0.9);
+    const opacity = Math.min(Math.random() + 0.2, 0.7);
 
     return (
       <div
@@ -184,7 +185,7 @@ const PigForDonation = ({ donationLevel }) => {
       );
     default:
       return (
-        <BalloonPigSvg style={{ width: "300px", height: "300px", zIndex: 1 }} />
+        <BalloonPigSvg style={{ width: "250px", height: "250px", zIndex: 1 }} />
       );
   }
 };
@@ -202,7 +203,11 @@ const Background = ({ children }) => {
         <RandomStars />
         <SpacePigContainer>
           <PigForDonation donationLevel={donationLevel} />
-          <MessageText>{displayMessage}</MessageText>
+          <MessageText>
+            {displayMessage.split("\n").map((m, i) => (
+              <p key={`message-${i}`}>{m}</p>
+            ))}
+          </MessageText>
         </SpacePigContainer>
       </SpaceArea>
       <MoonArea>
