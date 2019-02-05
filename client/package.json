@@ -6,7 +6,6 @@
   "dependencies": {
     "drizzle": "^1.2.4",
     "drizzle-react": "^1.2.0",
-    "drizzle-react-components": "^1.2.0",
     "idx": "^2.5.2",
     "ramda": "^0.26.1",
     "react": "16.8.0-alpha.0",
