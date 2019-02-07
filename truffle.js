@@ -32,13 +32,31 @@ module.exports = {
         );
       },
       network_id: 4,
-      gas: 4612388
+      gas: 4712388
+    },
+    ropsten: {
+      provider: () => {
+        if (!mnemonic) {
+          throw new Error("MNEMONIC env variable missing");
+        }
+
+        if (!infuraKey) {
+          throw new Error("INFURA_KEY env variable missing");
+        }
+
+        return new HDWalletProvider(
+          mnemonic,
+          `https://ropsten.infura.io/${infuraKey}`
+        );
+      },
+      network_id: 3,
+      gas: 4712388
     }
   },
   solc: {
     optimizer: {
       enabled: true,
-      runs: 200
+      runs: 2000
     }
   }
 };
