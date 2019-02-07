@@ -1,19 +1,29 @@
 pragma solidity ^0.5.1;
 
-import 'openzeppelin-solidity/contracts/lifecycle/Pausable.sol';
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 import './YOTPBadge.sol';
 import './Charities.sol';
 
-contract DonationManager is Pausable {
+contract DonationManager is Ownable {
     YOTPBadge private trustedYTOPBage;
     Charities private trustedCharities;
+    bool private isStopped;
 
     constructor(address _YOTPBadge, address _charities)
         public
     {
         trustedYTOPBage = YOTPBadge(_YOTPBadge);
         trustedCharities = Charities(_charities);
+        isStopped  = false;
+    }
+
+    /**
+     * @dev allow function to be called only when not stopped state
+     */
+    modifier whenNotStopped() {
+        require(isStopped == false, "contract stopped");
+        _;
     }
 
     /**
@@ -32,6 +42,13 @@ contract DonationManager is Pausable {
         uint createdAt
     );
 
+    function stop()
+        onlyOwner
+        public
+    {
+        isStopped = true;
+    }
+
     /**
      * @dev allows anyone to download to a charity and receive/give away a collectible ERC721 token
      * @param charityName string the identifier of charity for which to donate the ether sent
@@ -40,7 +57,7 @@ contract DonationManager is Pausable {
      */
     function donate(string memory charityName, address receiver, string memory message)
         payable
-        whenNotPaused
+        whenNotStopped
         public
     {
         require(msg.value >= 8 finney, "0.008 ether min donation");
