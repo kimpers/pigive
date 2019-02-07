@@ -8,7 +8,7 @@ contract YOTPBadge is ERC721Full, Ownable {
     mapping(uint => string) public badgeLevelURIs;
 
     constructor(uint _maxSupply)
-        ERC721Full("YearOfThePigBadge", "YPB")
+        ERC721Full("PiGive", "PiGi")
         public
     {
         require(_maxSupply > 0, "requires positive max supply");
