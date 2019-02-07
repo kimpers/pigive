@@ -1,10 +1,9 @@
 pragma solidity ^0.5.1;
 
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Mintable.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
-contract YOTPBadge is ERC721Full, ERC721Mintable, Ownable {
+contract YOTPBadge is ERC721Full, Ownable {
     uint maxSupply;
     mapping(uint => string) public badgeLevelURIs;
 
