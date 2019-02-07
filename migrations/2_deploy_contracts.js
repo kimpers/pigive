@@ -8,6 +8,7 @@ const SILVER_BADGE_HASH = "QmZ7kXE3ww3j3542ArK5awSPmXjhQcanZ7tr58DohrVLTU";
 const GOLD_BADGE_HASH = "QmWEBryUXhkm5aV8giSre58PT7k3Eap8qGVhWwWiGVyhTR";
 
 const MAX_SUPPLY = process.env.MAX_SUPPLY || 10;
+console.log(`MAX_SUPPLY is ${MAX_SUPPLY}`);
 
 module.exports = async deployer => {
   await deployer.deploy(YOTPBadge, MAX_SUPPLY);
